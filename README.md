@@ -1,15 +1,15 @@
-Agent CCSIM (Multi-Agent Contact Centre Simulator)
-==================================================
+Agent CCSIM
+============
 
-Welcome to this Agent based Contact Centre simulator
+Welcome to Agent CCSIM, a Multi-Agent Contact Centre simulator. The simulator uses the Cougaar multi-agent infrastructure and can be deployed on a single node or multiple nodes. The simulator deploys any number of agents based on the model data provided. Agent modules represent the contact centre agents and can receive customer requests such as calls from the system. The routing is performed in a number of ways from a simple router that distributes the calls to agents to probabilistic routing. If you wish to experiment with this infrastructure and want more details feel free to drop me a message.
 
-From this repository you can build the simulator and use it with the Cougaar multi-agent system. 
+From this repository you can build the simulator and use it with the Cougaar multi-agent system by following the Cougaar deployment instructions.
 
 Prerequisites
 --------------
 - Latest version of Eclipse
 - Cougaar 12.4
-- Model data from a Contact Centre
+- Model data that can be used to simulate a Contact Centre
 
 Quickstart
 ----------
