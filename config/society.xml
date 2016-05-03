@@ -1,0 +1,12 @@
+<node name="ccsim_jvm">      
+	<component class="com.ccsim.ACDViewerPlugin" insertionpoint="Node.AgentManager.Agent.PluginManager.Plugin" priority="COMPONENT"/>
+	 <component class="org.cougaar.planning.servlet.PlanViewServlet">
+     <argument>/tasks</argument>
+   </component>
+	<agent name="logger"><component class="com.ccsim.LogPlugin"/>
+	 <component class="org.cougaar.planning.servlet.PlanViewServlet">
+     <argument>/tasks</argument>
+   </component>	
+   </agent>
+</node>
+

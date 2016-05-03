@@ -1,0 +1,12 @@
+<node name="dtraskas_jvm">      
+	<component class="ACDViewerPlugin" insertionpoint="Node.AgentManager.Agent.PluginManager.Plugin" priority="COMPONENT"/>	
+	 <component class="org.cougaar.planning.servlet.PlanViewServlet">
+     <argument>/tasks</argument>
+   </component>
+	<agent name="logger"><component class="LogPlugin"/>
+	 <component class="org.cougaar.planning.servlet.PlanViewServlet">
+     <argument>/tasks</argument>
+   </component>	
+   </agent>
+</node>
+

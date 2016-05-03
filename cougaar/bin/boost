@@ -1,0 +1,143 @@
+#!/bin/bash
+
+# <copyright>
+#  
+#  Copyright 2001-2004 BBNT Solutions, LLC
+#  under sponsorship of the Defense Advanced Research Projects
+#  Agency (DARPA).
+# 
+#  You can redistribute this software and/or modify it under the
+#  terms of the Cougaar Open Source License as published on the
+#  Cougaar Open Source Website (www.cougaar.org).
+# 
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#  
+# </copyright>
+
+
+#
+# boost runs an arbitrary java class using the cougaar bootstrapper
+# usage:  boost [-v] [-preoptions ...] my.class.Name [-postoptions ...]
+#   -v  outputs debugging information to stdout during the script's execution
+#   -preoptions are passed as VM arguments, generally -D args, but must start with "-"
+#   my.class.Name the name of the class to run
+#   -postoptions are passed as Node arguments (e.g. after the node classname) and may be of
+#      any form understood by the Node class
+# 
+# The environment variable $COUGAAR_INSTALL_PATH should be set to the installed location
+# of Cougaar if not set, the script will check $CIP and then will attempt to 
+# guess based on where the Node script is located.
+#
+# Unlike Node, boost does not set any of the assorted VM parameters or
+# cougaar-application related options.  Only COUGAAR_INSTALL_PATH is passed to the
+# bootstrapper.
+#
+# !!!WARNING TO THOSE MODIFYING THIS SCRIPT!!!  Arguments must be separated by
+# newlines!
+
+scriptname=`basename $0`
+
+verbose=
+
+# deal with command-line arguments
+# commandline arguments before the nodename
+preargs=
+# prepreargs are low-level VM args
+prepreargs=
+# commandline arguments after the nodename
+postargs=
+# the classname is defined to be the first name without a "-" prefix
+clname=
+
+while [ x"$1" != x ]; do
+  case $1 in
+    -v) verbose=1
+	shift
+	continue;;
+    -X*) prepreargs="$prepreargs
+$1"
+        shift
+	continue;;
+    -*) preargs="$preargs
+$1"
+	shift
+	continue;;
+    *) clname="$1"
+	shift
+	break;;
+  esac
+done
+
+if [ -z "$COUGAAR_INSTALL_PATH" ]; then
+    if [ "$CIP" ]; then
+	export COUGAAR_INSTALL_PATH="$CIP";
+    else
+	s=`echo "$0" | sed -e 's,/bin/boost,,'`
+	if [ x$s != x ] ; then
+	    #echo "Warning: Defaulting COUGAAR_INSTALL_PATH to '$s'!";
+	    export COUGAAR_INSTALL_PATH=$s
+	else
+	    echo "Error: Could not find COUGAAR_INSTALL_PATH!";
+	    exit;
+	fi
+    fi
+fi
+
+if [ x"$clname" == x ]; then
+    echo "Error: No classname specified! ";
+    exit;
+fi
+
+# anything leftover is postargs
+# special postarg handling - not sure why I cannot just use $*, even with IFS
+# postargs="$*"
+while [ x"$1" != x ]; do
+    postargs="$postargs
+$1"
+    shift
+done
+
+if [ -z "$COUGAAR_WORKSPACE" ]; then
+    export COUGAAR_WORKSPACE="$COUGAAR_INSTALL_PATH/workspace";
+    if [ $verbose ]; then echo "Defaulting COUGAAR_WORKSPACE to $COUGAAR_WORKSPACE"; fi
+fi
+
+
+# This is a minimal classpath for booting - usually only bootstrap.jar is required
+jars="$COUGAAR_INSTALL_PATH/lib/bootstrap.jar"
+
+# Cougaar Arguments: set up the cougaar application
+cargs="-Dorg.cougaar.install.path=$COUGAAR_INSTALL_PATH
+-Dorg.cougaar.workspace=$COUGAAR_WORKSPACE
+-Dorg.cougaar.system.path=$COUGAAR3RDPARTY";
+
+# name of the bootstrapper class
+bootclass="org.cougaar.bootstrap.Bootstrapper"
+
+allargs="$prepreargs
+${bootargs}
+${cargs}
+${preargs}
+-classpath
+$jars
+${bootclass}
+${clname}
+${postargs}"
+
+if [ $verbose ]; then 
+    unspaced=`echo $allargs | sed -e 's,\n, ,'`
+    echo "java $unspaced"; 
+fi
+
+IFS=$'\n'
+exec java $allargs

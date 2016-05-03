@@ -1,0 +1,21 @@
+<?xml version='1.0'?>
+
+<!--
+This file contains the "hello world" runtime System Properties.
+-->
+<runtime>
+
+  <!-- Set infrastructure to single-JVM, see doc/OnlineManual/Templates.html -->
+  <vm_parameter
+    name="-Dorg.cougaar.society.xsl.param.template"
+    value="single_node"/>
+  <vm_parameter name="-Dorg.cougaar.society.xsl.param.mobility" value="true"/>		
+  <vm_parameter>-Xms256M</vm_parameter>
+  <vm_parameter>-Xmx1024M</vm_parameter>	 	
+  
+  <!-- Optional log4j config file -->
+  <vm_parameter
+    name="-Dorg.cougaar.core.logging.config.filename"
+    value="logging.props"/>
+<vm_parameter name="-Dorg.cougaar.core.agent.quiet" value="true"/>
+</runtime>
